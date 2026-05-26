@@ -16,7 +16,6 @@
 package org.mybatis.cdi;
 
 import jakarta.enterprise.context.spi.CreationalContext;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -24,7 +23,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 
 /**
@@ -32,50 +30,44 @@ import org.apache.ibatis.session.SqlSessionFactory;
  */
 public class SerializableMapperProxy<T> implements InvocationHandler, Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private transient Object mapper;
+    private transient Object mapper;
 
-  private final MyBatisBean bean;
+    private final MyBatisBean bean;
 
-  private final CreationalContext<T> creationalContext;
+    private final CreationalContext<T> creationalContext;
 
-  /**
-   * Instantiates a new serializable mapper proxy.
-   *
-   * @param bean
-   *          the bean
-   * @param creationalContext
-   *          the creational context
-   */
-  public SerializableMapperProxy(MyBatisBean bean, CreationalContext<T> creationalContext) {
-    this.bean = bean;
-    this.creationalContext = creationalContext;
-    this.mapper = getMapper();
-  }
-
-  @Override
-  public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    try {
-      return method.invoke(this.mapper, args);
-    } catch (InvocationTargetException e) {
-      throw e.getTargetException();
+    /**
+     * Instantiates a new serializable mapper proxy.
+     *
+     * @param bean
+     *          the bean
+     * @param creationalContext
+     *          the creational context
+     */
+    public SerializableMapperProxy(MyBatisBean bean, CreationalContext<T> creationalContext) {
+        this.bean = bean;
+        this.creationalContext = creationalContext;
+        this.mapper = getMapper();
     }
-  }
 
-  private Object getMapper() {
-    SqlSessionFactory factory = CDIUtils.findSqlSessionFactory(this.bean.sqlSessionFactoryName, this.bean.qualifiers,
-        this.creationalContext);
-    return CDIUtils.getRegistry(this.creationalContext).getManager(factory).getMapper(this.bean.type);
-  }
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
-  private void readObject(ObjectInputStream is) throws ClassNotFoundException, IOException {
-    is.defaultReadObject();
-    this.mapper = getMapper();
-  }
+    private Object getMapper() {
+        SqlSessionFactory factory = CDIUtils.findSqlSessionFactory(this.bean.sqlSessionFactoryName, this.bean.qualifiers, this.creationalContext);
+        return CDIUtils.getRegistry(this.creationalContext).getManager(factory).getMapper(this.bean.type);
+    }
 
-  private void writeObject(ObjectOutputStream os) throws IOException {
-    os.defaultWriteObject();
-  }
+    private void readObject(ObjectInputStream is) throws ClassNotFoundException, IOException {
+        is.defaultReadObject();
+        this.mapper = getMapper();
+    }
 
+    private void writeObject(ObjectOutputStream os) throws IOException {
+        os.defaultWriteObject();
+    }
 }

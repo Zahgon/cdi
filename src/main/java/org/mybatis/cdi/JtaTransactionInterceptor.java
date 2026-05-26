@@ -35,33 +35,23 @@ import jakarta.transaction.UserTransaction;
 @Interceptor
 public class JtaTransactionInterceptor extends LocalTransactionInterceptor {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Inject
-  private transient Instance<UserTransaction> userTransaction;
+    @Inject
+    private transient Instance<UserTransaction> userTransaction;
 
-  @Override
-  protected boolean isTransactionActive() throws SystemException {
-    return this.userTransaction.get().getStatus() != Status.STATUS_NO_TRANSACTION;
-  }
-
-  @Override
-  protected void beginJta() throws NotSupportedException, SystemException {
-    this.userTransaction.get().begin();
-  }
-
-  @Override
-  protected void endJta(boolean isExternaTransaction, boolean needsRollback)
-      throws SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-    if (isExternaTransaction) {
-      if (needsRollback) {
-        this.userTransaction.get().setRollbackOnly();
-      }
-    } else if (needsRollback) {
-      this.userTransaction.get().rollback();
-    } else {
-      this.userTransaction.get().commit();
+    @Override
+    protected boolean isTransactionActive() throws SystemException {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-  }
 
+    @Override
+    protected void beginJta() throws NotSupportedException, SystemException {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    protected void endJta(boolean isExternaTransaction, boolean needsRollback) throws SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 }

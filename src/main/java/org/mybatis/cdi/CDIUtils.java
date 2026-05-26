@@ -22,11 +22,9 @@ import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.enterprise.util.AnnotationLiteral;
-
 import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 
 /**
@@ -34,68 +32,54 @@ import org.apache.ibatis.session.SqlSessionFactory;
  */
 public final class CDIUtils {
 
-  private CDIUtils() {
-    // this class cannot be instantiated
-  }
-
-  /**
-   * Gets a CDI BeanManager instance
-   *
-   * @return BeanManager instance
-   */
-  private static BeanManager getBeanManager() {
-    return CDI.current().getBeanManager();
-  }
-
-  /**
-   * Gets the registry.
-   *
-   * @param creationalContext
-   *          the creational context
-   *
-   * @return the registry
-   */
-  public static <T> SqlSessionManagerRegistry getRegistry(CreationalContext<T> creationalContext) {
-    final BeanManager beanManager = getBeanManager();
-    Iterator<Bean<? extends Object>> beans = beanManager.getBeans(SqlSessionManagerRegistry.class).iterator();
-    return (SqlSessionManagerRegistry) beanManager.getReference(beans.next(), SqlSessionManagerRegistry.class,
-        creationalContext);
-  }
-
-  /**
-   * Find sql session factory.
-   *
-   * @param name
-   *          the name
-   * @param qualifiers
-   *          the qualifiers
-   * @param creationalContext
-   *          the creational context
-   *
-   * @return the sql session factory
-   */
-  public static <T> SqlSessionFactory findSqlSessionFactory(String name, Set<Annotation> qualifiers,
-      CreationalContext<T> creationalContext) {
-    final BeanManager beanManager = getBeanManager();
-    Set<Bean<? extends Object>> beans;
-    if (name != null) {
-      beans = beanManager.getBeans(name);
-    } else {
-      beans = beanManager.getBeans(SqlSessionFactory.class, qualifiers.toArray(new Annotation[] {}));
+    private CDIUtils() {
+        // this class cannot be instantiated
     }
-    Bean<? extends Object> bean = beanManager.resolve(beans);
-    if (bean == null) {
-      throw new MybatisCdiConfigurationException("There are no SqlSessionFactory producers properly configured.");
+
+    /**
+     * Gets a CDI BeanManager instance
+     *
+     * @return BeanManager instance
+     */
+    private static BeanManager getBeanManager() {
+        return CDI.current().getBeanManager();
     }
-    return (SqlSessionFactory) beanManager.getReference(bean, SqlSessionFactory.class, creationalContext);
-  }
 
-  public static class SerializableDefaultAnnotationLiteral extends AnnotationLiteral<Default> {
-    private static final long serialVersionUID = 1L;
-  }
+    /**
+     * Gets the registry.
+     *
+     * @param creationalContext
+     *          the creational context
+     *
+     * @return the registry
+     */
+    public static <T> SqlSessionManagerRegistry getRegistry(CreationalContext<T> creationalContext) {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
-  public static class SerializableAnyAnnotationLiteral extends AnnotationLiteral<Any> {
-    private static final long serialVersionUID = 1L;
-  }
+    /**
+     * Find sql session factory.
+     *
+     * @param name
+     *          the name
+     * @param qualifiers
+     *          the qualifiers
+     * @param creationalContext
+     *          the creational context
+     *
+     * @return the sql session factory
+     */
+    public static <T> SqlSessionFactory findSqlSessionFactory(String name, Set<Annotation> qualifiers, CreationalContext<T> creationalContext) {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
+    public static class SerializableDefaultAnnotationLiteral extends AnnotationLiteral<Default> {
+
+        private static final long serialVersionUID = 1L;
+    }
+
+    public static class SerializableAnyAnnotationLiteral extends AnnotationLiteral<Any> {
+
+        private static final long serialVersionUID = 1L;
+    }
 }

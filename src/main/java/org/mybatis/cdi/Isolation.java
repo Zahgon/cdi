@@ -25,26 +25,20 @@ import org.apache.ibatis.session.TransactionIsolationLevel;
  */
 public enum Isolation {
 
-  DEFAULT(null),
+    DEFAULT(null),
+    NONE(TransactionIsolationLevel.NONE),
+    READ_COMMITTED(TransactionIsolationLevel.READ_COMMITTED),
+    READ_UNCOMMITTED(TransactionIsolationLevel.READ_UNCOMMITTED),
+    REPEATABLE_READ(TransactionIsolationLevel.REPEATABLE_READ),
+    SERIALIZABLE(TransactionIsolationLevel.SERIALIZABLE);
 
-  NONE(TransactionIsolationLevel.NONE),
+    private final TransactionIsolationLevel transactionIsolationLevel;
 
-  READ_COMMITTED(TransactionIsolationLevel.READ_COMMITTED),
+    Isolation(TransactionIsolationLevel value) {
+        this.transactionIsolationLevel = value;
+    }
 
-  READ_UNCOMMITTED(TransactionIsolationLevel.READ_UNCOMMITTED),
-
-  REPEATABLE_READ(TransactionIsolationLevel.REPEATABLE_READ),
-
-  SERIALIZABLE(TransactionIsolationLevel.SERIALIZABLE);
-
-  private final TransactionIsolationLevel transactionIsolationLevel;
-
-  Isolation(TransactionIsolationLevel value) {
-    this.transactionIsolationLevel = value;
-  }
-
-  public TransactionIsolationLevel getTransactionIsolationLevel() {
-    return this.transactionIsolationLevel;
-  }
-
+    public TransactionIsolationLevel getTransactionIsolationLevel() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 }

@@ -24,11 +24,9 @@ import jakarta.transaction.HeuristicRollbackException;
 import jakarta.transaction.NotSupportedException;
 import jakarta.transaction.RollbackException;
 import jakarta.transaction.SystemException;
-
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
-
 import org.apache.ibatis.session.SqlSessionManager;
 
 /**
@@ -44,164 +42,129 @@ import org.apache.ibatis.session.SqlSessionManager;
 @Interceptor
 public class LocalTransactionInterceptor implements Serializable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  @Inject
-  private transient SqlSessionManagerRegistry registry;
+    @Inject
+    private transient SqlSessionManagerRegistry registry;
 
-  /**
-   * Invoke.
-   *
-   * @param ctx
-   *          the ctx
-   *
-   * @return the object
-   *
-   * @throws Exception
-   *           the exception
-   */
-  @AroundInvoke
-  public Object invoke(InvocationContext ctx) throws Exception {
-    Transactional transactional = getTransactionalAnnotation(ctx);
-    boolean isInitiator = start(transactional);
-    boolean isExternalJta = isTransactionActive();
-    if (isInitiator && !isExternalJta) {
-      beginJta();
+    /**
+     * Invoke.
+     *
+     * @param ctx
+     *          the ctx
+     *
+     * @return the object
+     *
+     * @throws Exception
+     *           the exception
+     */
+    @AroundInvoke
+    public Object invoke(InvocationContext ctx) throws Exception {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-    boolean needsRollback = transactional.rollbackOnly();
-    Object result;
-    try {
-      result = ctx.proceed();
-    } catch (Exception ex) {
-      Exception unwrapped = unwrapException(ex);
-      needsRollback = needsRollback || needsRollback(transactional, unwrapped);
-      throw unwrapped;
-    } finally {
-      if (isInitiator) {
-        try {
-          if (needsRollback) {
-            rollback(transactional);
-          } else {
-            commit(transactional);
-          }
-        } finally {
-          close();
-          endJta(isExternalJta, needsRollback);
+
+    /**
+     * Checks if is transaction active.
+     *
+     * @return true, if is transaction active
+     *
+     * @throws SystemException
+     *           used by jtaTransactionInterceptor
+     */
+    protected boolean isTransactionActive() throws SystemException {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    /**
+     * Begin jta.
+     *
+     * @throws NotSupportedException
+     *           used by jtaTransactionInterceptor
+     * @throws SystemException
+     *           used by jtaTransactionInterceptor
+     */
+    protected void beginJta() throws NotSupportedException, SystemException {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    /**
+     * End jta.
+     *
+     * @param isExternaTransaction
+     *          the is externa transaction
+     * @param commit
+     *          the commit
+     *
+     * @throws SystemException
+     *           used by jtaTransactionInterceptor
+     * @throws RollbackException
+     *           used by jtaTransactionInterceptor
+     * @throws HeuristicMixedException
+     *           used by jtaTransactionInterceptor
+     * @throws HeuristicRollbackException
+     *           used by jtaTransactionInterceptor
+     */
+    protected void endJta(boolean isExternaTransaction, boolean commit) throws SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    private boolean needsRollback(Transactional transactional, Throwable throwable) {
+        if (RuntimeException.class.isAssignableFrom(throwable.getClass())) {
+            return true;
         }
-      }
+        for (Class<? extends Throwable> exceptionClass : transactional.rollbackFor()) {
+            if (exceptionClass.isAssignableFrom(throwable.getClass())) {
+                return true;
+            }
+        }
+        return false;
     }
-    return result;
-  }
 
-  /**
-   * Checks if is transaction active.
-   *
-   * @return true, if is transaction active
-   *
-   * @throws SystemException
-   *           used by jtaTransactionInterceptor
-   */
-  protected boolean isTransactionActive() throws SystemException {
-    return false;
-  }
-
-  /**
-   * Begin jta.
-   *
-   * @throws NotSupportedException
-   *           used by jtaTransactionInterceptor
-   * @throws SystemException
-   *           used by jtaTransactionInterceptor
-   */
-  protected void beginJta() throws NotSupportedException, SystemException {
-    // nothing to do
-  }
-
-  /**
-   * End jta.
-   *
-   * @param isExternaTransaction
-   *          the is externa transaction
-   * @param commit
-   *          the commit
-   *
-   * @throws SystemException
-   *           used by jtaTransactionInterceptor
-   * @throws RollbackException
-   *           used by jtaTransactionInterceptor
-   * @throws HeuristicMixedException
-   *           used by jtaTransactionInterceptor
-   * @throws HeuristicRollbackException
-   *           used by jtaTransactionInterceptor
-   */
-  protected void endJta(boolean isExternaTransaction, boolean commit)
-      throws SystemException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
-    // nothing to do
-  }
-
-  private boolean needsRollback(Transactional transactional, Throwable throwable) {
-    if (RuntimeException.class.isAssignableFrom(throwable.getClass())) {
-      return true;
+    protected Transactional getTransactionalAnnotation(InvocationContext ctx) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-    for (Class<? extends Throwable> exceptionClass : transactional.rollbackFor()) {
-      if (exceptionClass.isAssignableFrom(throwable.getClass())) {
-        return true;
-      }
-    }
-    return false;
-  }
 
-  protected Transactional getTransactionalAnnotation(InvocationContext ctx) {
-    Transactional t = ctx.getMethod().getAnnotation(Transactional.class);
-    if (t == null) {
-      t = ctx.getMethod().getDeclaringClass().getAnnotation(Transactional.class);
+    private boolean start(Transactional transactional) {
+        boolean started = false;
+        for (SqlSessionManager manager : this.registry.getManagers()) {
+            if (!manager.isManagedSessionStarted()) {
+                manager.startManagedSession(transactional.executorType(), transactional.isolation().getTransactionIsolationLevel());
+                started = true;
+            }
+        }
+        return started;
     }
-    return t;
-  }
 
-  private boolean start(Transactional transactional) {
-    boolean started = false;
-    for (SqlSessionManager manager : this.registry.getManagers()) {
-      if (!manager.isManagedSessionStarted()) {
-        manager.startManagedSession(transactional.executorType(),
-            transactional.isolation().getTransactionIsolationLevel());
-        started = true;
-      }
+    private void commit(Transactional transactional) {
+        for (SqlSessionManager manager : this.registry.getManagers()) {
+            manager.commit(transactional.force());
+        }
     }
-    return started;
-  }
 
-  private void commit(Transactional transactional) {
-    for (SqlSessionManager manager : this.registry.getManagers()) {
-      manager.commit(transactional.force());
+    private void rollback(Transactional transactional) {
+        for (SqlSessionManager manager : this.registry.getManagers()) {
+            manager.rollback(transactional.force());
+        }
     }
-  }
 
-  private void rollback(Transactional transactional) {
-    for (SqlSessionManager manager : this.registry.getManagers()) {
-      manager.rollback(transactional.force());
+    private void close() {
+        for (SqlSessionManager manager : this.registry.getManagers()) {
+            manager.close();
+        }
     }
-  }
 
-  private void close() {
-    for (SqlSessionManager manager : this.registry.getManagers()) {
-      manager.close();
+    private Exception unwrapException(Exception wrapped) {
+        Throwable unwrapped = wrapped;
+        while (true) {
+            if (unwrapped instanceof InvocationTargetException) {
+                unwrapped = ((InvocationTargetException) unwrapped).getTargetException();
+            } else if (unwrapped instanceof UndeclaredThrowableException) {
+                unwrapped = ((UndeclaredThrowableException) unwrapped).getUndeclaredThrowable();
+            } else if (!(unwrapped instanceof Exception)) {
+                return new RuntimeException(unwrapped);
+            } else {
+                return (Exception) unwrapped;
+            }
+        }
     }
-  }
-
-  private Exception unwrapException(Exception wrapped) {
-    Throwable unwrapped = wrapped;
-    while (true) {
-      if (unwrapped instanceof InvocationTargetException) {
-        unwrapped = ((InvocationTargetException) unwrapped).getTargetException();
-      } else if (unwrapped instanceof UndeclaredThrowableException) {
-        unwrapped = ((UndeclaredThrowableException) unwrapped).getUndeclaredThrowable();
-      } else if (!(unwrapped instanceof Exception)) {
-        return new RuntimeException(unwrapped);
-      } else {
-        return (Exception) unwrapped;
-      }
-    }
-  }
-
 }

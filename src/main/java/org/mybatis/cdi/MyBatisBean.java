@@ -20,7 +20,6 @@ import jakarta.enterprise.context.spi.CreationalContext;
 import jakarta.enterprise.inject.spi.Bean;
 import jakarta.enterprise.inject.spi.InjectionPoint;
 import jakarta.enterprise.inject.spi.PassivationCapable;
-
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Proxy;
@@ -28,7 +27,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.ibatis.executor.ErrorContext;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -41,108 +39,99 @@ import org.apache.ibatis.session.SqlSessionManager;
  */
 public class MyBatisBean implements Bean<Object>, Serializable, PassivationCapable {
 
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  protected final Class<Type> type;
+    protected final Class<Type> type;
 
-  // Do not make this transient
-  protected final Set<Annotation> qualifiers;
+    // Do not make this transient
+    protected final Set<Annotation> qualifiers;
 
-  protected final String sqlSessionFactoryName;
+    protected final String sqlSessionFactoryName;
 
-  protected final String id;
+    protected final String id;
 
-  /**
-   * Instantiates a new my batis bean.
-   *
-   * @param id
-   *          the id
-   * @param type
-   *          the type
-   * @param qualifiers
-   *          the qualifiers
-   * @param sqlSessionFactoryName
-   *          the sql session factory name
-   */
-  public MyBatisBean(String id, Class<Type> type, Set<Annotation> qualifiers, String sqlSessionFactoryName) {
-    this.id = id;
-    this.type = type;
-    this.sqlSessionFactoryName = sqlSessionFactoryName;
-    if (qualifiers == null || qualifiers.isEmpty()) {
-      this.qualifiers = new HashSet<>();
-      this.qualifiers.add(new CDIUtils.SerializableDefaultAnnotationLiteral());
-      this.qualifiers.add(new CDIUtils.SerializableAnyAnnotationLiteral());
-    } else {
-      this.qualifiers = qualifiers;
+    /**
+     * Instantiates a new my batis bean.
+     *
+     * @param id
+     *          the id
+     * @param type
+     *          the type
+     * @param qualifiers
+     *          the qualifiers
+     * @param sqlSessionFactoryName
+     *          the sql session factory name
+     */
+    public MyBatisBean(String id, Class<Type> type, Set<Annotation> qualifiers, String sqlSessionFactoryName) {
+        this.id = id;
+        this.type = type;
+        this.sqlSessionFactoryName = sqlSessionFactoryName;
+        if (qualifiers == null || qualifiers.isEmpty()) {
+            this.qualifiers = new HashSet<>();
+            this.qualifiers.add(new CDIUtils.SerializableDefaultAnnotationLiteral());
+            this.qualifiers.add(new CDIUtils.SerializableAnyAnnotationLiteral());
+        } else {
+            this.qualifiers = qualifiers;
+        }
     }
-  }
 
-  @Override
-  public Set<Type> getTypes() {
-    Set<Type> types = new HashSet<>();
-    types.add(this.type);
-    return types;
-  }
-
-  @Override
-  public Set<Annotation> getQualifiers() {
-    return this.qualifiers;
-  }
-
-  @Override
-  public Class<Dependent> getScope() {
-    return Dependent.class;
-  }
-
-  @Override
-  public String getName() {
-    return null;
-  }
-
-  @Override
-  public Set<Class<? extends Annotation>> getStereotypes() {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public Class<Type> getBeanClass() {
-    return this.type;
-  }
-
-  @Override
-  public boolean isAlternative() {
-    return false;
-  }
-
-  @Override
-  public Set<InjectionPoint> getInjectionPoints() {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public Object create(CreationalContext<Object> creationalContext) {
-    if (SqlSession.class.equals(this.type)) {
-      return findSqlSessionManager(creationalContext);
+    @Override
+    public Set<Type> getTypes() {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-    ErrorContext.instance().reset();
-    return Proxy.newProxyInstance(SqlSessionFactory.class.getClassLoader(), new Class[] { this.type },
-        new SerializableMapperProxy<>(this, creationalContext));
-  }
 
-  @Override
-  public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-    creationalContext.release();
-  }
+    @Override
+    public Set<Annotation> getQualifiers() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
-  private <T> SqlSessionManager findSqlSessionManager(CreationalContext<T> creationalContext) {
-    SqlSessionFactory factory = CDIUtils.findSqlSessionFactory(this.sqlSessionFactoryName, this.qualifiers,
-        creationalContext);
-    return CDIUtils.getRegistry(creationalContext).getManager(factory);
-  }
+    @Override
+    public Class<Dependent> getScope() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
-  @Override
-  public String getId() {
-    return this.id;
-  }
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 
+    @Override
+    public Set<Class<? extends Annotation>> getStereotypes() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    public Class<Type> getBeanClass() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    public boolean isAlternative() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    public Set<InjectionPoint> getInjectionPoints() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    public Object create(CreationalContext<Object> creationalContext) {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    @Override
+    public void destroy(Object instance, CreationalContext<Object> creationalContext) {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
+
+    private <T> SqlSessionManager findSqlSessionManager(CreationalContext<T> creationalContext) {
+        SqlSessionFactory factory = CDIUtils.findSqlSessionFactory(this.sqlSessionFactoryName, this.qualifiers, creationalContext);
+        return CDIUtils.getRegistry(creationalContext).getManager(factory);
+    }
+
+    @Override
+    public String getId() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 }

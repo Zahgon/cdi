@@ -20,12 +20,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Any;
 import jakarta.enterprise.inject.Instance;
 import jakarta.inject.Inject;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionManager;
 
@@ -35,34 +33,25 @@ import org.apache.ibatis.session.SqlSessionManager;
 @ApplicationScoped
 public class SqlSessionManagerRegistry {
 
-  private Map<SqlSessionFactory, SqlSessionManager> managers;
+    private Map<SqlSessionFactory, SqlSessionManager> managers;
 
-  @Inject
-  @Any
-  private Instance<SqlSessionFactory> factories;
+    @Inject
+    @Any
+    private Instance<SqlSessionFactory> factories;
 
-  /**
-   * Inits the SqlSessionManagerRegistry.
-   */
-  @PostConstruct
-  public void init() {
-    if (this.factories.isUnsatisfied()) {
-      throw new MybatisCdiConfigurationException("There are no SqlSessionFactory producers properly configured.");
+    /**
+     * Inits the SqlSessionManagerRegistry.
+     */
+    @PostConstruct
+    public void init() {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-    Map<SqlSessionFactory, SqlSessionManager> m = new HashMap<>();
-    for (SqlSessionFactory factory : this.factories) {
-      SqlSessionManager manager = SqlSessionManager.newInstance(factory);
-      m.put(factory, manager);
+
+    public SqlSessionManager getManager(SqlSessionFactory factory) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-    this.managers = Collections.unmodifiableMap(m);
-  }
 
-  public SqlSessionManager getManager(SqlSessionFactory factory) {
-    return this.managers.get(factory);
-  }
-
-  public Collection<SqlSessionManager> getManagers() {
-    return this.managers.values();
-  }
-
+    public Collection<SqlSessionManager> getManagers() {
+        throw new UnsupportedOperationException("STUB: not implemented");
+    }
 }
